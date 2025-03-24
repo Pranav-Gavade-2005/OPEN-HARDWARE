@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Download, FileText, File } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import Navbar from './Navbar';
 
 function ProjectView() {
   const { id } = useParams();
@@ -41,6 +42,8 @@ function ProjectView() {
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen bg-gray-50 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Header */}
@@ -256,6 +259,7 @@ function ProjectView() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

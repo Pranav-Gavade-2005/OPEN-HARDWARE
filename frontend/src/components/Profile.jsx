@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, LogOut, Edit2, Trash2 } from 'lucide-react';
 import { getCurrentUser, logout } from '../services/api';
+import Navbar from './Navbar';
 
 function Profile() {
   const navigate = useNavigate();
@@ -67,6 +68,8 @@ function Profile() {
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen bg-gray-50 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
@@ -178,6 +181,7 @@ function Profile() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

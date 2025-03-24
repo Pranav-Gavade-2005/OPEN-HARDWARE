@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Plus, X, Settings } from 'lucide-react';
+import { Upload, Plus, X, Settings, Delete, Trash, Trash2, Trash2Icon } from 'lucide-react';
+import Navbar from './Navbar';
 
 function CreateRepo() {
   const navigate = useNavigate();
@@ -157,10 +158,12 @@ function CreateRepo() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="min-h-screen bg-gray-50 pt-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Project</h1>
+        <div className="bg-white rounded-lg shadow p-9">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6 pb-2">Create New Project</h1>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
@@ -175,7 +178,7 @@ function CreateRepo() {
                 required
                 value={formData.title}
                 onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 font-bold"
               />
             </div>
 
@@ -190,7 +193,7 @@ function CreateRepo() {
                 required
                 value={formData.description}
                 onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
               />
             </div>
 
@@ -205,7 +208,7 @@ function CreateRepo() {
                 required
                 value={formData.readme}
                 onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
                 placeholder="# Project Title&#10;## Description&#10;## Installation&#10;## Usage"
               />
             </div>
@@ -246,7 +249,7 @@ function CreateRepo() {
                         {(file.size / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
-                    <button
+                    <button 
                       type="button"
                       onClick={() => removeFile(index)}
                       className="text-gray-400 hover:text-gray-500"
@@ -366,7 +369,7 @@ function CreateRepo() {
                               type={column.type}
                               value={row.values[column.id] || ''}
                               onChange={(e) => handleBomChange(row.id, column.id, e.target.value)}
-                              className="block w-full border-gray-300 rounded-md shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+                              className="block p-2 w-full border-gray-600 rounded-md shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                             />
                           </td>
                         ))}
@@ -376,7 +379,7 @@ function CreateRepo() {
                             onClick={() => removeBomRow(row.id)}
                             className="text-gray-400 hover:text-gray-500"
                           >
-                            <X className="h-4 w-4" />
+                            <Trash2Icon className="h-4 w-4 text-red-500" />
                           </button>
                         </td>
                       </tr>
@@ -399,6 +402,7 @@ function CreateRepo() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
