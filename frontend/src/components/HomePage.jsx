@@ -22,14 +22,15 @@ const HomePage = () => {
                                 </p>
                                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                                     <div className="rounded-md shadow">
-                                        <div
+                                        <Link
+                                            to={'/login'}
                                             // to={isAuthenticated ? "/profile" : "/login"}
                                             className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 md:py-4 md:text-lg md:px-10"
                                         >
                                             {/* {isAuthenticated ? "Go to Profile" : "Get Started"} */}
                                             Get Started!
                                             <ChevronRight className="ml-2" size={20} />
-                                        </div>
+                                        </Link>
                                     </div>
                                     <div className="mt-3 sm:mt-0 sm:ml-3">
                                         <a href="#learn-more" className="w-full flex items-center justify-center px-8 py-3 border border-gray-900 text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10">
@@ -150,7 +151,7 @@ const HomePage = () => {
                         {/* Project 1 */}
                         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                             <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                                <div className="w-full h-48 bg-gray-300"></div>
+                                <img className="w-full h-48 bg-gray-300" src={"./home/smartHome.jpg"}></img>
                             </div>
                             <div className="p-6">
                                 <h3 className="text-xl font-bold text-gray-900">Smart Home Controller</h3>
@@ -160,7 +161,7 @@ const HomePage = () => {
                         {/* Project 2 */}
                         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                             <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                                <div className="w-full h-48 bg-gray-300"></div>
+                                <img className="w-full h-48 bg-gray-300" src={'./home/environmentMonitor.jpg'}></img>
                             </div>
                             <div className="p-6">
                                 <h3 className="text-xl font-bold text-gray-900">Environmental Monitor</h3>
@@ -170,7 +171,7 @@ const HomePage = () => {
                         {/* Project 3 */}
                         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                             <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                                <div className="w-full h-48 bg-gray-300"></div>
+                                <img className="w-full h-48 bg-gray-300" src={'./home/roboticsPlatform.jpg'}></img>
                             </div>
                             <div className="p-6">
                                 <h3 className="text-xl font-bold text-gray-900">Robotics Platform</h3>
@@ -236,7 +237,7 @@ const HomePage = () => {
                                     type="text"
                                     name="name"
                                     id="name"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                                    className="p-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
                                 />
                             </div>
                             <div>
@@ -245,7 +246,7 @@ const HomePage = () => {
                                     type="email"
                                     name="email"
                                     id="email"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                                    className="p-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
                                 />
                             </div>
                             <div>
@@ -254,7 +255,7 @@ const HomePage = () => {
                                     name="message"
                                     id="message"
                                     rows="4"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                                    className="p-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900"
                                 ></textarea>
                             </div>
                             <div>

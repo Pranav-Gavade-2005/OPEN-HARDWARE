@@ -2,21 +2,84 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
+// Create axios instance with default config
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 
-// Add token to requests if it exists
+// Add auth token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
+
+// Repository API functions
+export const repositoryApi = {
+  // Create a new repository
+  createRepository: async (formData) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${API_URL}/repositories`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Don't set Content-Type header when sending FormData
+          // The browser will set it automatically with the correct boundary
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create repository');
+      }
+
+      return response.json();
+    } catch (error) {
+      if (error.message === 'No authentication token found') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        throw new Error('Session expired. Please login again.');
+      }
+      throw error;
+    }
+  },
+
+  // Get all repositories for the current user
+  getUserRepositories: async () => {
+    try {
+      const response = await api.get('/repositories/user');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch repositories' };
+    }
+  },
+
+  // Get a single repository
+  getRepository: async (id) => {
+    try {
+      const response = await api.get(`/repositories/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch repository' };
+    }
+  }
+};
+
+export default repositoryApi;
 
 export const login = async (email, password) => {
   try {
@@ -48,47 +111,6 @@ export const logout = () => {
 export const getCurrentUser = () => {
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
-};
-
-// Repository API functions
-export const createRepository = async (formData) => {
-  const response = await fetch(`${API_URL}/repositories`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    },
-    body: formData
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to create repository');
-  }
-  
-  return response.json();
-};
-
-export const getUserRepositories = async () => {
-  const response = await fetch(`${API_URL}/repositories/user`, {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    }
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch repositories');
-  }
-  
-  return response.json();
-};
-
-export const getRepository = async (id) => {
-  const response = await fetch(`${API_URL}/repositories/${id}`);
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch repository');
-  }
-  
-  return response.json();
 };
 
 export const updateRepository = async (id, formData) => {
@@ -153,6 +175,4 @@ export const starRepository = async (id) => {
   }
   
   return response.json();
-};
-
-export default api; 
+}; 

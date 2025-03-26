@@ -19,48 +19,36 @@ const repositorySchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  files: [{
-    name: String,
-    originalName: String,
-    path: String,
-    size: Number,
-    type: String,
-    uploadedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-  images: [{
-    name: String,
-    originalName: String,
-    path: String,
-    size: Number,
-    uploadedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-  bom: {
-    columns: [{
-      id: String,
-      label: String,
-      type: String
+  files: {
+    cad: [{
+      name: String,
+      size: Number,
+      path: String
     }],
-    rows: [{
-      id: String,
-      values: {
-        type: Map,
-        of: String
-      }
+    documentation: [{
+      name: String,
+      size: Number,
+      path: String
+    }],
+    report: [{
+      name: String,
+      size: Number,
+      path: String
+    }],
+    layout: [{
+      name: String,
+      size: Number,
+      path: String
     }]
   },
-  stars: {
-    type: Number,
-    default: 0
-  },
-  downloads: {
-    type: Number,
-    default: 0
+  images: [{
+    name: String,
+    size: Number,
+    path: String
+  }],
+  bom: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
   },
   createdAt: {
     type: Date,
@@ -72,7 +60,6 @@ const repositorySchema = new mongoose.Schema({
   }
 });
 
-// Update the updatedAt timestamp before saving
 repositorySchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();

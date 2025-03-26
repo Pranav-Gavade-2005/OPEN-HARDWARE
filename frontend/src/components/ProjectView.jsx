@@ -22,8 +22,8 @@ function ProjectView() {
         layout: [{ name: 'pcb_design.zip', size: '5.4MB' }],
       },
       images: [
-        '/mock/image1.jpg',
-        '/mock/image2.jpg',
+        './mock/project1.jfif',
+        './mock/project2.jpg',
       ],
       readme: `# Smart Home Controller\n\n## Description\nThis project is an open-source home automation system...\n\n## Installation\n1. Clone the repository\n2. Install dependencies\n3. Upload firmware\n\n## Usage\nFollow these steps to set up your controller...`,
       bom: [
@@ -207,7 +207,7 @@ function ProjectView() {
               {project.images.map((image, index) => (
                 <div key={index} className="aspect-w-16 aspect-h-9">
                   <img
-                    src={image}
+                    src={'./mock/project1.jfif'}
                     alt={`Project image ${index + 1}`}
                     className="object-cover rounded-lg"
                   />

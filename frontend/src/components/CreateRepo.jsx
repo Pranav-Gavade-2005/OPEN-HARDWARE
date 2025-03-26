@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, Plus, X, Settings, Delete, Trash, Trash2, Trash2Icon } from 'lucide-react';
 import Navbar from './Navbar';
+import { repositoryApi } from '../services/api';
 
 function CreateRepo() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function CreateRepo() {
   const [previewImages, setPreviewImages] = useState([]);
   const [showBomSettings, setShowBomSettings] = useState(false);
   const [newColumn, setNewColumn] = useState({ label: '', type: 'text' });
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,10 +44,19 @@ function CreateRepo() {
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     
-    // Separate images and other files
-    const images = files.filter(file => file.type.startsWith('image/'));
-    const otherFiles = files.filter(file => !file.type.startsWith('image/'));
+    // Update files based on category
+    setFormData(prev => ({
+      ...prev,
+      files: {
+        ...prev.files,
+        cad: [...prev.files.cad, ...files]
+      }
+    }));
+  };
 
+  const handleImageUpload = (e) => {
+    const images = Array.from(e.target.files);
+    
     // Update images
     setFormData(prev => ({
       ...prev,
@@ -55,15 +66,6 @@ function CreateRepo() {
     // Create preview URLs for images
     const newPreviews = images.map(file => URL.createObjectURL(file));
     setPreviewImages(prev => [...prev, ...newPreviews]);
-
-    // Update other files
-    setFormData(prev => ({
-      ...prev,
-      files: {
-        ...prev.files,
-        cad: [...prev.files.cad, ...otherFiles]
-      }
-    }));
   };
 
   const removeFile = (index, isImage = false) => {
@@ -153,8 +155,36 @@ function CreateRepo() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement API call to save project
-    navigate('/profile');
+    setError('');
+    
+    try {
+      // Create FormData object
+      const formDataToSend = new FormData();
+      
+      // Add basic fields
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('readme', formData.readme);
+      
+      // Add BOM data as JSON string
+      formDataToSend.append('bom', JSON.stringify(formData.bom));
+      
+      // Add files
+      formData.files.cad.forEach((file) => {
+        formDataToSend.append('files', file);
+      });
+      
+      // Add images
+      formData.images.forEach((image) => {
+        formDataToSend.append('images', image);
+      });
+
+      await repositoryApi.createRepository(formDataToSend);
+      navigate('/profile');
+    } catch (error) {
+      console.error('Failed to create repository:', error);
+      setError(error.message || 'Failed to create repository. Please try again.');
+    }
   };
 
   return (
@@ -164,6 +194,12 @@ function CreateRepo() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow p-9">
           <h1 className="text-2xl font-bold text-gray-900 mb-6 pb-2">Create New Project</h1>
+          
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600">{error}</p>
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
@@ -213,7 +249,7 @@ function CreateRepo() {
               />
             </div>
 
-            {/* Unified File Upload */}
+            {/* Project Files Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Project Files
@@ -231,53 +267,69 @@ function CreateRepo() {
                   className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  Upload Files
+                  Upload Project Files
                 </label>
               </div>
-
-              {/* File List */}
-              <div className="mt-4 space-y-2">
-                {formData.files.cad.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center">
-                      <File className="h-5 w-5 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-900">{file.name}</span>
-                      <span className="ml-2 text-sm text-gray-500">
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </span>
-                    </div>
-                    <button 
-                      type="button"
-                      onClick={() => removeFile(index)}
-                      className="text-gray-400 hover:text-gray-500"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Image Previews */}
-              {previewImages.length > 0 && (
+              {formData.files.cad.length > 0 && (
                 <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Image Previews</h3>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                    {previewImages.map((preview, index) => (
-                      <div key={index} className="relative">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded Files:</h3>
+                  <ul className="space-y-2">
+                    {formData.files.cad.map((file, index) => (
+                      <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                        <span className="text-sm text-gray-600">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Project Images Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Project Images
+              </label>
+              <div className="mt-1 flex items-center">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="sr-only"
+                  id="project-images"
+                />
+                <label
+                  htmlFor="project-images"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Project Images
+                </label>
+              </div>
+              {formData.images.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded Images:</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="relative group">
                         <img
-                          src={preview}
+                          src={previewImages[index]}
                           alt={`Preview ${index + 1}`}
-                          className="h-24 w-full object-cover rounded-lg"
+                          className="w-full h-32 object-cover rounded-md"
                         />
                         <button
                           type="button"
                           onClick={() => removeFile(index, true)}
-                          className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-sm"
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <X className="h-4 w-4 text-gray-500" />
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
                     ))}
@@ -320,12 +372,12 @@ function CreateRepo() {
                       value={newColumn.label}
                       onChange={(e) => setNewColumn(prev => ({ ...prev, label: e.target.value }))}
                       placeholder="Column Name"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+                      className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                     />
                     <select
                       value={newColumn.type}
                       onChange={(e) => setNewColumn(prev => ({ ...prev, type: e.target.value }))}
-                      className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
+                      className="w-32 p-2 rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                     >
                       <option value="text">Text</option>
                       <option value="number">Number</option>
