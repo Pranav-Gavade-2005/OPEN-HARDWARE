@@ -76,6 +76,45 @@ export const repositoryApi = {
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch repository' };
     }
+  },
+
+
+  // Get the owner of a repository
+  getRepositoryOwner: async (id) => {
+    const response = await api.get(`/repositories/owner/${id}`);
+    return response.data;
+  },
+
+  // Search repositories
+  searchRepositories: async (query) => {
+    try {
+      const response = await api.get(`/repositories/search?q=${encodeURIComponent(query)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to search repositories' };
+    }
+  },
+
+  // Download repository
+  downloadRepository: async (id) => {
+    try {
+      const response = await api.get(`/repositories/${id}/download`, {
+        responseType: 'blob'
+      });
+      
+      // Create a blob from the response data
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `repository-${id}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to download repository' };
+    }
   }
 };
 
@@ -113,6 +152,7 @@ export const getCurrentUser = () => {
   return user ? JSON.parse(user) : null;
 };
 
+
 export const updateRepository = async (id, formData) => {
   const response = await fetch(`${API_URL}/repositories/${id}`, {
     method: 'PUT',
@@ -125,7 +165,6 @@ export const updateRepository = async (id, formData) => {
   if (!response.ok) {
     throw new Error('Failed to update repository');
   }
-  
   return response.json();
 };
 

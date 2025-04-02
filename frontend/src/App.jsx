@@ -9,7 +9,7 @@ import ProjectView from './components/ProjectView';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
-
+import SearchPage from './components/SearchPage';
 
 
 function App() {
@@ -25,10 +25,11 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-repo" element={<CreateRepo />} />
           <Route path="/project/:id" element={<ProjectView />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
 
         {/* Footer */}
-        <Footer/>
+        <Footer />
       </div>
     </Router>
   );

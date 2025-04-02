@@ -10,12 +10,7 @@ function CreateRepo() {
     title: '',
     description: '',
     readme: '',
-    files: {
-      cad: [],
-      documentation: [],
-      report: [],
-      layout: [],
-    },
+    files: [],
     images: [],
     bom: {
       columns: [
@@ -47,10 +42,7 @@ function CreateRepo() {
     // Update files based on category
     setFormData(prev => ({
       ...prev,
-      files: {
-        ...prev.files,
-        cad: [...prev.files.cad, ...files]
-      }
+      files: [...prev.files, ...files]
     }));
   };
 
@@ -79,10 +71,7 @@ function CreateRepo() {
     } else {
       setFormData(prev => ({
         ...prev,
-        files: {
-          ...prev.files,
-          cad: prev.files.cad.filter((_, i) => i !== index)
-        }
+        files: [...prev.files, prev.files.filter((_, i) => i !== index) ]
       }));
     }
   };
@@ -170,7 +159,7 @@ function CreateRepo() {
       formDataToSend.append('bom', JSON.stringify(formData.bom));
       
       // Add files
-      formData.files.cad.forEach((file) => {
+      formData.files.forEach((file) => {
         formDataToSend.append('files', file);
       });
       
@@ -270,11 +259,11 @@ function CreateRepo() {
                   Upload Project Files
                 </label>
               </div>
-              {formData.files.cad.length > 0 && (
+              {formData.files.length > 0 && (
                 <div className="mt-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded Files:</h3>
                   <ul className="space-y-2">
-                    {formData.files.cad.map((file, index) => (
+                    {formData.files.map((file, index) => (
                       <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
                         <span className="text-sm text-gray-600">{file.name}</span>
                         <button
@@ -397,18 +386,22 @@ function CreateRepo() {
               {/* BOM Table */}
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
+                  <thead className="bg-gray-50">
                     <tr>
                       {formData.bom.columns.map((column) => (
-                        <th
-                          key={column.id}
-                          className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        >
+                        <th key={column.id} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {column.label}
+                          <button
+                            type="button"
+                            onClick={() => removeBomColumn(column.id)}
+                            className="ml-2 text-red-500 hover:text-red-700"
+                          >
+                            <X className="h-4 w-4 inline" />
+                          </button>
                         </th>
                       ))}
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Action
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
                       </th>
                     </tr>
                   </thead>

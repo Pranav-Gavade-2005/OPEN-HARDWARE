@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, LogOut, Edit2, Trash2 } from 'lucide-react';
-import repositoryApi, { getCurrentUser, logout } from '../services/api';
+import repositoryApi, { deleteRepository, getCurrentUser, logout } from '../services/api';
 import Navbar from './Navbar';
 
 function Profile() {
@@ -10,62 +10,81 @@ function Profile() {
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchUser = async () => {
+    try {
+      const userData = await getCurrentUser();
+      setUser(userData);
+
+      const userRepo = await repositoryApi.getUserRepositories();
+      console.log(userRepo);
+
+      // console.log({
+      //   "id": userRepo.data[0]._id,
+      //   "title": userRepo.data[0].title,
+      //   "description": userRepo.data[0].description,
+      //   "image": userRepo.data[0].images[0].path
+      // });
+
+      setRepos(
+        userRepo.data.map((repo) => ({
+        id: repo._id ,
+        title: repo.title ,
+        description: repo.description ,
+        image: repo.images?.[0]?.path || './mock/default.jpg', // Use default image if no image is found
+        stars: repo.stars || 0, // Optional, set to 0 if not available
+        downloads: repo.downloads || 0, // Optional, set to 0 if not available
+      })))
+
+      // TODO: Fetch user's repositories from API
+      //For now, using mock data
+      // setRepos([
+      //   {
+      //     id: 1,
+      //     title: 'Smart Home Controller',
+      //     description: 'An open-source home automation system built with Arduino.',
+      //     image: './mock/project1.jfif',
+      //     stars: 12,
+      //     downloads: 45,
+      //   },
+      //   {
+      //     id: 2,
+      //     title: 'Weather Station',
+      //     description: 'DIY weather station with temperature, humidity, and pressure sensors.',
+      //     image: './mock/project2.jpg',
+      //     stars: 8,
+      //     downloads: 32,
+      //   },
+      // ]);
+    
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      navigate('/login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getCurrentUser();
-        setUser(userData);
-
-        // console.log(userData._id);
-        const userRepo = await repositoryApi.getUserRepositories();
-
-        // console.log({
-        //   "id": userRepo.data[0]._id,
-        //   "title": userRepo.data[0].title,
-        //   "description": userRepo.data[0].description,
-        //   "image": userRepo.data[0].images[0].path
-        // });
-
-        setRepos(
-          userRepo.data.map((repo) => ({
-          id: repo._id ,
-          title: repo.title ,
-          description: repo.description ,
-          image: repo.images?.[0]?.path || './mock/default.jpg', // Use default image if no image is found
-          stars: repo.stars || 0, // Optional, set to 0 if not available
-          downloads: repo.downloads || 0, // Optional, set to 0 if not available
-        })))
-
-        // TODO: Fetch user's repositories from API
-        //For now, using mock data
-        // setRepos([
-        //   {
-        //     id: 1,
-        //     title: 'Smart Home Controller',
-        //     description: 'An open-source home automation system built with Arduino.',
-        //     image: './mock/project1.jfif',
-        //     stars: 12,
-        //     downloads: 45,
-        //   },
-        //   {
-        //     id: 2,
-        //     title: 'Weather Station',
-        //     description: 'DIY weather station with temperature, humidity, and pressure sensors.',
-        //     image: './mock/project2.jpg',
-        //     stars: 8,
-        //     downloads: 32,
-        //   },
-        // ]);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        navigate('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUser();
   }, [navigate]);
+
+
+  const handleDeleteRepo = async (id) =>
+  {
+      try 
+      {
+        const ans = confirm("Do you really want to delete this repository?");
+        if(ans)
+        {
+          res = await deleteRepository(id);
+          navigate(`/profile`);
+        }           
+
+      } catch (error) {
+        console.log(error);
+      }
+  }
+
 
   const handleLogout = async () => {
     try {
@@ -152,8 +171,7 @@ function Profile() {
                 {repos.map((repo) => (
                   <div
                     key={repo.id}
-                    className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-                  >
+                    className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                     <div className="aspect-w-16 aspect-h-9 h-48 object-cover">
                       <img
                         // src={require(`../mock/${repo.image}`)}
@@ -169,12 +187,12 @@ function Profile() {
                           <button className="text-gray-400 hover:text-gray-500">
                             <Edit2 className="h-4 w-4" />
                           </button>
-                          <button className="text-gray-400 hover:text-red-500">
+                          <button className="text-gray-400 hover:text-red-500" onClick={() => handleDeleteRepo(repo.id)}>
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </div>
-                      <p className="text-gray-600 text-sm mb-4">{repo.description}</p>
+                      <p className="text-gray-600 text-sm mb-4 overflow-hidden line-clamp-2">{repo.description}</p>
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <div className="flex items-center">
                           <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -191,7 +209,7 @@ function Profile() {
                       </div>
                       <button
                         onClick={() => navigate(`/project/${repo.id}`)}
-                        className="mt-4 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800"
+                        className="mt-4 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 cursor-pointer"
                       >
                         View Project
                       </button>

@@ -39,10 +39,22 @@ router.post('/', auth,
   repositoryController.createRepository
 );
 
+// Search repositories
+router.get('/search', repositoryController.searchRepositories);
+
+// Download repository
+router.get('/:id/download', repositoryController.downloadRepository);
+
 // Get all repositories for the authenticated user
 router.get('/user', auth, repositoryController.getUserRepositories);
 
 // Get a single repository
 router.get('/:id', auth, repositoryController.getRepository);
+
+// Get the owner of a repository
+router.get('/owner/:id', auth, repositoryController.getRepositoryOwner);
+
+//Deleting a single repo
+router.delete('/:id', auth, repositoryController.deleteRepository);
 
 module.exports = router; 

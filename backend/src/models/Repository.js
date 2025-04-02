@@ -19,28 +19,11 @@ const repositorySchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  files: {
-    cad: [{
+  files: [{
       name: String,
       size: Number,
       path: String
-    }],
-    documentation: [{
-      name: String,
-      size: Number,
-      path: String
-    }],
-    report: [{
-      name: String,
-      size: Number,
-      path: String
-    }],
-    layout: [{
-      name: String,
-      size: Number,
-      path: String
-    }]
-  },
+   }],
   images: [{
     name: String,
     size: Number,
