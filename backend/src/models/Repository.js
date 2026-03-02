@@ -25,17 +25,7 @@ const repositorySchema = new mongoose.Schema({
       size: Number,
       path: String
     }],
-    documentation: [{
-      name: String,
-      size: Number,
-      path: String
-    }],
-    report: [{
-      name: String,
-      size: Number,
-      path: String
-    }],
-    layout: [{
+    docs: [{
       name: String,
       size: Number,
       path: String

@@ -1,6 +1,4 @@
-import { useState, useEffect, createContext } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Profile from './components/Profile';
@@ -9,7 +7,11 @@ import ProjectView from './components/ProjectView';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
-
+import SearchPage from './components/SearchPage';
+import { getCurrentUser } from './services/api';
+import EditProfile from './components/EditProfile';
+import PublicProfile from './components/PublicProfile';
+import EditProjectView from './components/EditProjectView';
 
 
 function App() {
@@ -19,16 +21,20 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage isLoggedIn={getCurrentUser()}/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/public-profile/:userId" element={<PublicProfile />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/create-repo" element={<CreateRepo />} />
           <Route path="/project/:id" element={<ProjectView />} />
+          <Route path="/edit-project/:id" element={<EditProjectView />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
 
         {/* Footer */}
-        <Footer/>
+        <Footer />
       </div>
     </Router>
   );

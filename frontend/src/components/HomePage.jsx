@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react
 import { ChevronRight, Home } from 'lucide-react';
 import Navbar from './Navbar';
 
-const HomePage = () => {
+const HomePage = ({isLoggedIn}) => {
+    //console.log(isLoggedIn ? "Hello" : "By");
+    
     return (
         <>
             <Navbar/>
@@ -23,12 +25,10 @@ const HomePage = () => {
                                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                                     <div className="rounded-md shadow">
                                         <Link
-                                            to={'/login'}
-                                            // to={isAuthenticated ? "/profile" : "/login"}
+                                            to={isLoggedIn ? "/profile" : "/login"}
                                             className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 md:py-4 md:text-lg md:px-10"
                                         >
-                                            {/* {isAuthenticated ? "Go to Profile" : "Get Started"} */}
-                                            Get Started!
+                                            {isLoggedIn ? "Go to Profile" : "Get Started"} 
                                             <ChevronRight className="ml-2" size={20} />
                                         </Link>
                                     </div>
