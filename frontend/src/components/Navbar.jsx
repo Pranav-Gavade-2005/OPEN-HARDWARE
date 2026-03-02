@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { Menu, X, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getCurrentUser } from '../services/api';
+import { getCurrentUser, logout } from '../services/api';
+
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,6 +10,9 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,12 +27,32 @@ function Navbar() {
       }
     };
     checkAuth();
+  }, [navigate]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
     }
   };
 
@@ -44,6 +68,7 @@ function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             {isAuthenticated ? (
               <>
+                
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="flex-1 max-w-lg">
                   <div className="relative">
@@ -51,20 +76,37 @@ function Navbar() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search repositories..."
+                      placeholder="Search projects..."
                       className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                     />
                     <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                   </div>
                 </form>
-                <Link to="/profile" className="flex items-center space-x-2">
-                  <img
-                    src={user?.profilePicture}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
-                  />
-                  <span className="text-gray-600">{user?.name}</span>
-                </Link>
+
+
+                <div className="relative " ref={dropdownRef}>
+                  <button onClick={() => setIsOpen(!isOpen)} className="cursor-pointer flex items-center space-x-2">
+                    <img
+                      src={user?.profilePicture}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                    />
+                    <span className="text-gray-600">{user?.name}</span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="cursor-pointer absolute left-0 z-10 mt-2 w-40 origin-top-left scale-95 transform transition duration-150 ease-out bg-white border rounded shadow-lg">
+                      <Link to='/profile' className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Dashboard
+                      </Link>
+                      <Link to={'/edit-profile'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</Link>
+                      <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={handleLogout}>
+                        Logout
+                      </div>
+                    </div>
+                  )}
+                </div>
+
               </>
             ) : (
               <>
@@ -73,11 +115,25 @@ function Navbar() {
                 <a href="#projects" className="text-gray-600 hover:text-gray-900">Projects</a>
                 <a href="#community" className="text-gray-600 hover:text-gray-900">Community</a>
                 <a href="#contact" className="text-gray-600 hover:text-gray-900">Contact</a>
+                {/* Search Bar */}
+                <form onSubmit={handleSearch} className="flex-1 max-w-lg">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search projects..."
+                      className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    />
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  </div>
+                </form>
+
                 <Link
                   to="/login"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800"
                 >
-                  Login 
+                  Login
                 </Link>
               </>
             )}
@@ -112,6 +168,21 @@ function Navbar() {
                 <a href="#projects" className="block px-3 py-2 text-gray-600 hover:text-gray-900">Projects</a>
                 <a href="#community" className="block px-3 py-2 text-gray-600 hover:text-gray-900">Community</a>
                 <a href="#contact" className="block px-3 py-2 text-gray-600 hover:text-gray-900">Contact</a>
+
+                {/* Search Bar */}
+                <form onSubmit={handleSearch} className="flex-1 max-w-lg">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search projects..."
+                      className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    />
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  </div>
+                </form>
+
                 <Link
                   to="/login"
                   className="block px-3 py-2 text-gray-600 hover:text-gray-900"

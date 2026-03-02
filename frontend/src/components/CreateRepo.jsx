@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Upload, Plus, X, Settings, Delete, Trash, Trash2, Trash2Icon } from 'lucide-react';
 import Navbar from './Navbar';
 import { repositoryApi } from '../services/api';
+import { toast, Toaster } from 'sonner';
 
 function CreateRepo() {
   const navigate = useNavigate();
@@ -10,7 +11,10 @@ function CreateRepo() {
     title: '',
     description: '',
     readme: '',
-    files: [],
+    files: {
+      cad: [],
+      docs: []
+    },
     images: [],
     bom: {
       columns: [
@@ -37,12 +41,41 @@ function CreateRepo() {
   };
 
   const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);    
+    // Update files based on category
+    setFormData(prev => ({
+      ...prev,
+      files: {
+        ...prev.files,
+        docs: [...prev.files.docs, ...files]
+      }
+    }));
+  };
+
+  const handleCADFileUpload = (e) => {
     const files = Array.from(e.target.files);
+    console.log(files);
+    
+    
+    // Validate file types
+    const validCADTypes = ['.stl', '.step', '.stp', '.iges', '.igs'];
+    const invalidFiles = files.filter(file => {
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      return !validCADTypes.includes(ext);
+    });
+
+    if (invalidFiles.length > 0) {
+      alert('Invalid file type. Only STL, STEP, STP, IGES, and IGS files are allowed.');
+      return;
+    }
     
     // Update files based on category
     setFormData(prev => ({
       ...prev,
-      files: [...prev.files, ...files]
+      files: {
+        ...prev.files,
+        cad: [...prev.files.cad, ...files]
+      }
     }));
   };
 
@@ -60,20 +93,27 @@ function CreateRepo() {
     setPreviewImages(prev => [...prev, ...newPreviews]);
   };
 
-  const removeFile = (index, isImage = false) => {
-    if (isImage) {
+  const removeFile = (type, index) => {
+
+    if(type != 'images')
+    {
       setFormData(prev => ({
         ...prev,
-        images: prev.images.filter((_, i) => i !== index)
+        files: {
+          ...prev.files,
+          [type]: prev.files[type].filter((_, i) => i !== index)
+        }
+      }));
+    }else
+    {
+      setFormData(prev => ({  
+        ...prev,
+          images: prev.images.filter((_, i) => i !== index)
       }));
       URL.revokeObjectURL(previewImages[index]);
       setPreviewImages(prev => prev.filter((_, i) => i !== index));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        files: [...prev.files, prev.files.filter((_, i) => i !== index) ]
-      }));
     }
+    
   };
 
   const addBomRow = () => {
@@ -142,6 +182,7 @@ function CreateRepo() {
     }));
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -158,8 +199,13 @@ function CreateRepo() {
       // Add BOM data as JSON string
       formDataToSend.append('bom', JSON.stringify(formData.bom));
       
-      // Add files
-      formData.files.forEach((file) => {
+      // Add CAD files
+      formData.files.cad.forEach((file) => {
+        formDataToSend.append('files', file);
+      });
+      
+      // Add document files
+      formData.files.docs.forEach((file) => {
         formDataToSend.append('files', file);
       });
       
@@ -168,7 +214,9 @@ function CreateRepo() {
         formDataToSend.append('images', image);
       });
 
+      console.log(formDataToSend);
       await repositoryApi.createRepository(formDataToSend);
+      toast.success("The project is created successfully!")
       navigate('/profile');
     } catch (error) {
       console.error('Failed to create repository:', error);
@@ -179,6 +227,7 @@ function CreateRepo() {
   return (
     <>
     <Navbar />
+    <Toaster/>
     <div className="min-h-screen bg-gray-50 pt-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow p-9">
@@ -241,7 +290,7 @@ function CreateRepo() {
             {/* Project Files Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Project Files
+                Project Documentation
               </label>
               <div className="mt-1 flex items-center">
                 <input
@@ -256,19 +305,61 @@ function CreateRepo() {
                   className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  Upload Project Files
+                  Upload Documentation Files
                 </label>
               </div>
-              {formData.files.length > 0 && (
+              {formData.files.docs.length > 0 && (
                 <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded Files:</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded Documentation:</h3>
                   <ul className="space-y-2">
-                    {formData.files.map((file, index) => (
+                    {formData.files.docs.map((file, index) => (
                       <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
                         <span className="text-sm text-gray-600">{file.name}</span>
                         <button
                           type="button"
-                          onClick={() => removeFile(index)}
+                          onClick={() => removeFile('docs', index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Project CAD Files Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Project CAD Files (.stl, .step, .stp, .iges, .igs files only)
+              </label>
+              <div className="mt-1 flex items-center">
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleCADFileUpload}
+                  className="sr-only"
+                  id="project-cad-files"
+                />
+                <label
+                  htmlFor="project-cad-files"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload CAD Files
+                </label>
+              </div>
+              {formData.files.cad.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded CAD Files:</h3>
+                  <ul className="space-y-2">
+                    {formData.files.cad.map((file, index) => (
+                      <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                        <span className="text-sm text-gray-600">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile('cad', index)}
                           className="text-red-500 hover:text-red-700"
                         >
                           <X className="h-4 w-4" />
@@ -315,7 +406,7 @@ function CreateRepo() {
                         />
                         <button
                           type="button"
-                          onClick={() => removeFile(index, true)}
+                          onClick={() => removeFile('images', index)}
                           className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-4 w-4" />
