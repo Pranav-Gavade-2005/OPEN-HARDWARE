@@ -167,42 +167,6 @@ Visit the frontend URL shown in terminal (usually `http://localhost:5173`).
 
 ---
 
-## Screenshots & Media 
-
-- **Landing / Home**
-
-<img src="docs/home_page.jpg" width="400" alt="Home Page">
-
-- **Dashboard**
-
-<img src="docs/dashboard.jpg" width="400" alt="Dashboard">
-
-- **Profile Page**
-
-<img src="docs/profile_page.jpg" width="400" alt="Profile Page">
-
-- **Search Page**
-
-<img src="docs/search_page.jpg" width="400" alt="Search Page">
-
-- **Create Repo Page**
-
-<img src="docs/create_repo_page.jpg" width="400" alt="Create Repo Page">
-
-- **Project View Pages**
-
-<img src="docs/view_project_1.jpg" width="500" height="350" style="object-fit: contain; background-color: white;" alt="Page 1"> 
-<img src="docs/view_project_2.jpg" width="500" height="350" style="object-fit: contain; background-color: white;" alt="Page 2"> 
-<img src="docs/view_project_3.jpg" width="500" height="350" style="object-fit: contain; background-color: white;" alt="Page 3"> 
-<img src="docs/view_project_4.jpg" width="500" height="350" style="object-fit: contain; background-color: white;" alt="Page 4">
-
-- **Edit Page**
-
-<img src="docs/edit_page_1.jpg" width="400" alt="Edit Page">
-
-
----
-
 ## 📁 Structure
 
 ```
