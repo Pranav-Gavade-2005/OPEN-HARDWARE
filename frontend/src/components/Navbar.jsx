@@ -14,7 +14,7 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
 
-  useEffect(() => {
+  useEffect( () => {
     const checkAuth = async () => {
       try {
         const userData = await getCurrentUser();

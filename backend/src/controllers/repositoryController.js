@@ -353,7 +353,7 @@ exports.downloadRepository = async (req, res) => {
     res.attachment(`${repository.title.toLowerCase().replace(/\s+/g, '-')}.zip`);
     archive.pipe(res);
 
-    console.log(repository.files.cad);
+    // console.log(repository.files.cad);
     
     // Add files to the archive
     if (repository.files && repository.files.cad) {

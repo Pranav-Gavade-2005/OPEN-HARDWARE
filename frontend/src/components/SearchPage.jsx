@@ -11,6 +11,7 @@ function SearchPage() {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+  
   useEffect(() => {
     const searchRepositories = async () => {
       try {

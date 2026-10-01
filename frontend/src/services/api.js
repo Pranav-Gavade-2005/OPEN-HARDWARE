@@ -10,7 +10,7 @@ const api = axios.create({
   }
 });
 
-// Add auth token to requests
+// Add auth token to requests 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -87,7 +87,6 @@ export const repositoryApi = {
       throw error.response?.data || { message: 'Failed to fetch repository' };
     }
   },
-
 
   // Get the owner of a repository
   getRepositoryOwner: async (id) => {

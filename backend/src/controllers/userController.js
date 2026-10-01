@@ -85,7 +85,7 @@ const getPublicUser = async (req, res) => {
   }
 }
 
-  const updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
     try
     {
       const { name, occupation } = req.body;
@@ -105,9 +105,9 @@ const getPublicUser = async (req, res) => {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: 'Server error'});
     }
-  } 
+} 
 
-  const updateProfilePassword = async (req, res) => {
+const updateProfilePassword = async (req, res) => {
     try{
       const { password } = req.body;
       const user = await User.findById(req.params.id).select('+password');
@@ -126,7 +126,7 @@ const getPublicUser = async (req, res) => {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: 'Server error'});
     }
-  }
+}
 
 module.exports = {
   updateProfilePicture,
